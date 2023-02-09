@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BackGroundView"
         tools:targetApi="33">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -24,7 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".service.BroadcastReceiverService" />
+
+        <service
+            android:name=".service.BroadcastReceiverService"
+            android:permission="android.permission.SYSTEM_ALERT_WINDOW" />
+
         <receiver
             android:name=".service.RebootReceiveService"
             android:enabled="true"

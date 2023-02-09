@@ -11,17 +11,17 @@ import com.example.backgroundview.service.BroadcastReceiverService;
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) { 
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         try {
-            Intent i = new Intent(this, BroadcastReceiverService.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent intent = new Intent(this, BroadcastReceiverService.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.startForegroundService(i);
+                this.startForegroundService(intent);
             } else {
-                this.startService(i);
+                this.startService(intent);
             }
         } catch (Exception e) {
             e.printStackTrace();

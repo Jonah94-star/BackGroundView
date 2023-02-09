@@ -1,6 +1,7 @@
 /**
  * 필요한 권한
  * android.permission.FOREGROUND_SERVICE
+ * android.permission.SYSTEM_ALERT_WINDOW
  */
 package com.example.backgroundview.service;
 
@@ -12,10 +13,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -25,9 +33,18 @@ import com.example.backgroundview.MainActivity;
 import com.example.backgroundview.R;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BroadcastReceiverService extends Service {
     private final String TAG = this.getClass().getSimpleName();
+
+    Timer timer = null;
+    int count = 0;
+
+    WindowManager windowManager;
+    View mView;
+    BackgorundViewService backgorundViewService;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -36,9 +53,12 @@ public class BroadcastReceiverService extends Service {
                 switch (intent.getAction()) {
                     case Intent.ACTION_SCREEN_OFF:      // 화면 꺼짐
                         Log.d(TAG, "ACTION_SCREEN_OFF");
+                        TimerStopService();
                         break;
                     case Intent.ACTION_USER_PRESENT:    // 화면 잠금해제
                         Log.d(TAG, "ACTION_USER_PRESENT");
+                        TimerStopService();
+                        TimerStartService();
                         break;
                     default:
                         break;
@@ -46,8 +66,6 @@ public class BroadcastReceiverService extends Service {
             }
         }
     };
-
-    private ArrayList<String> packageNames;
 
     @Override
     public void onCreate() {
@@ -70,6 +88,7 @@ public class BroadcastReceiverService extends Service {
                 e.printStackTrace();
             }
         }
+        TimerStopService();
     }
 
     @Nullable
@@ -135,4 +154,33 @@ public class BroadcastReceiverService extends Service {
         startForeground(1, builder.build());
     }
 
+    void TimerStartService() {
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                count++;
+                Log.e(TAG, "count: " + count);
+            }
+        };
+        timer.schedule(task, 100, 1000); // 1초 뒤 1분마다 반복실행
+        setupBackgorundView();
+    }
+
+    void TimerStopService() {
+        if (timer != null) {
+            try {
+                timer.cancel();
+                timer = null;
+            } catch (Exception e) {
+                e.getMessage();
+            }
+        }
+    }
+
+    void setupBackgorundView() {
+        LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        backgorundViewService = new BackgorundViewService(inflate, windowManager, mView);
+    }
 }
